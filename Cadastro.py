@@ -1,41 +1,64 @@
-#Primeiro fazer com que os nomes e as senhas sejam salvas na lista de nome e sennha.
-#Se ao cadastrar ja estiver o nome outra pessoa cadastrada, erro de cadastro, e tentativa para inserir outro nome.
 import os
-nome = []
-senha = []
-while True:
+
+class User:
+    def __init__(self, name, password):
+        self.name = name
+        self.password = password
+
+class UserDatabase:
+    def __init__(self):
+        self.users = []
+
+    def add_user(self, name, password):
+        self.users.append(User(name, password))
+
+    def is_valid_user(self, name, password):
+        for user in self.users:
+            if user.name == name and user.password == password:
+                return True
+        return False
+
+def register_user(database):
     print('-'*40)
     print(f'{"Tela de cadastro":^40}')
     print('-' * 40)
-    dados_nome=(input('Nome: '))
-    while dados_nome in nome or dados_nome == '':
-        dados_nome=(input('opção inválida ou nome já existente! Tente outro: ').strip())
-    dados_senha=(input('Senha: ').strip())
-    while dados_senha == '':
-        dados_senha = input('opção inválida, digite uma senha: ')
-    nome.append(dados_nome)
-    senha.append(dados_senha)
-    opcao = input('Cadastrar mais alguem? [S/N] ').strip().upper()
-    while opcao != 'S' and opcao != 'N':
-        opcao = input('Opção inválida! Cadastrar mais alguem? [S/N] ').strip().upper()
-    if opcao == 'N':
-        break
-    os.system('cls||clear')
-#Fazer com que o usuário consiga fazer o login depois de se cadastrar.
-#3 tentativas.
+    while True:
+        name = input('Nome: ').strip()
+        if name == '':
+            print('Nome inválido!')
+            continue
+        if any(user.name == name for user in database.users):
+            print('Nome já existente!')
+            continue
+        password = input('Senha: ').strip()
+        if password == '':
+            print('Senha inválida!')
+            continue
+        database.add_user(name, password)
+        opcao = input('Cadastrar mais alguém? [S/N] ').strip().upper()
+        while opcao != 'S' and opcao != 'N':
+            opcao = input('Opção inválida! Cadastrar mais alguém? [S/N] ').strip().upper()
+        if opcao == 'N':
+            break
+        os.system('cls||clear')
 
-nome_login = ''
-senha_login = ''
-print('-' * 40)
-print(f'{"Login":^40}')
-print('-' * 40)
-for login in range(3):
-    nome_login = input('Digite seu nome: ').strip()
-    senha_login = input('Digite sua senha: ').strip()
-    if nome_login not in nome or senha_login not in senha:
+def login(database):
+    print('-' * 40)
+    print(f'{"Login":^40}')
+    print('-' * 40)
+    for _ in range(3):
+        name = input('Digite seu nome: ').strip()
+        password = input('Digite sua senha: ').strip()
+        if database.is_valid_user(name, password):
+            print(f'Bem-vindo, {name}!')
+            return
         print('Nome e/ou senha inválidos!')
-    if nome_login in nome and senha_login in senha:
-        print(f'Bem vindo {nome_login}!')
-        break
-if nome_login not in nome and senha_login not in senha:
     print('Você excedeu o número de tentativas, tente novamente mais tarde.')
+
+def main():
+    database = UserDatabase()
+    register_user(database)
+    login(database)
+
+if __name__ == '__main__':
+    main()
